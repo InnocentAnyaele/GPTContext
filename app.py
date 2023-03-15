@@ -33,20 +33,38 @@ def hello_world():
 @app.route('/addContext', methods=['POST'])
 def add_context():
     if request.method == 'POST':
+        print ('reached---------------------------')
         
+        # sending from postman
+        # try:
+        #     files = request.files.getlist('file')
+        #     indexKey = str(uuid.uuid1())
+        #     dirName = os.path.join('./uploads/', indexKey)
+        #     os.makedirs(dirName)
+            
+        #     for file in files:
+        #         filename = file.filename
+        #         new_filename = os.path.join(dirName,secure_filename(filename))
+        #         file.save(new_filename)   
+
+            
+         # sending from the frontend
         try:
-            files = request.files.getlist('file')
             indexKey = str(uuid.uuid1())
             dirName = os.path.join('./uploads/', indexKey)
             os.makedirs(dirName)
-            
-            for file in files:
-                filename = file.filename
+            print ('this is the file length', request.form['fileLength'])
+            for i in range(int(request.form['fileLength'])):
+                currFileName = 'file'+str(i)
+                print ('currFileName', currFileName)
+                currFile = request.files[currFileName]
+                filename = currFile.filename
                 new_filename = os.path.join(dirName,secure_filename(filename))
-                file.save(new_filename)   
+                currFile.save(new_filename)  
             
             t = threading.Thread(target=delete_context, args=(dirName,))
             t.start()
+            
             
             try:
                 SimpleDirectoryReader = download_loader('SimpleDirectoryReader')
