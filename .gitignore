@@ -1,3 +1,4 @@
+keys.py
 .DS_Store
 .env
 .flaskenv
@@ -19,12 +20,12 @@ build/
 .idea/
 docs/_build/
 .vscode
-keys.py
-.keys.py
+
 
 # Coverage reports
 htmlcov/
 .coverage
 .coverage.*
 *,cover
+
 
