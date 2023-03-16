@@ -6,9 +6,10 @@ import uuid
 import threading
 import time
 import shutil
+import keys
 
 # os.environ['OPENAI_API_KEY'] = 'key-here'
-
+os.environ['OPENAI_API_KEY'] = keys.OPENAI_API_KEY
 
 root = os.path.dirname(__file__)
 
