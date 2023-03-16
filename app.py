@@ -6,13 +6,14 @@ import uuid
 import threading
 import time
 import shutil
-# from dotenv import load_dotenv
+
+# os.environ['OPENAI_API_KEY'] = 'key-here'
 
 
 root = os.path.dirname(__file__)
 
 app = Flask(__name__)
-# app.config['DEBUG'] = True
+app.config['DEBUG'] = True
 
 
 def delete_context(dirName):
@@ -27,6 +28,7 @@ def delete_context(dirName):
 
 @app.route("/")
 def hello_world():
+    # print (os.environ['OPENAI_API_KEY'])
     return "<p>The Flask API route for GPTContext</p>"
         
 
@@ -52,7 +54,7 @@ def add_context():
          # sending from the frontend
         try:
             indexKey = str(uuid.uuid1())
-            dirName = os.path.join(root, '/uploads/', indexKey)
+            dirName = os.path.join('./uploads/', indexKey)
             os.makedirs(dirName)
             print ('this is the file length', request.form['fileLength'])
             for i in range(int(request.form['fileLength'])):
@@ -144,8 +146,8 @@ def deleteAllContext():
     if request.method == 'DELETE':
         try:
             path = '/uploads'
-            if os.path.exists(root, path):
-                shutil.rmtree(root, path)
+            if os.path.exists(path):
+                shutil.rmtree(path)
                 response = make_response('Folder removed!')
                 response.status_code = 200
                 return response
