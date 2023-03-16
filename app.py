@@ -1,17 +1,18 @@
-from flask import Flask, render_template, request, redirect, make_response, jsonify
-from llama_index import GPTSimpleVectorIndex, Document, SimpleDirectoryReader, download_loader
+from flask import Flask, request, make_response
+from llama_index import GPTSimpleVectorIndex, download_loader
 from werkzeug.utils import secure_filename
-import pickle
 import os
-import io
 import uuid
 import threading
 import time
 import shutil
 # from dotenv import load_dotenv
 
+
+root = os.path.dirname(__file__)
+
 app = Flask(__name__)
-app.config['DEBUG'] = True
+# app.config['DEBUG'] = True
 
 
 def delete_context(dirName):
@@ -51,7 +52,7 @@ def add_context():
          # sending from the frontend
         try:
             indexKey = str(uuid.uuid1())
-            dirName = os.path.join('./uploads/', indexKey)
+            dirName = os.path.join(root, '/uploads/', indexKey)
             os.makedirs(dirName)
             print ('this is the file length', request.form['fileLength'])
             for i in range(int(request.form['fileLength'])):
@@ -142,9 +143,9 @@ def get_response():
 def deleteAllContext():
     if request.method == 'DELETE':
         try:
-            path = './uploads'
-            if os.path.exists(path):
-                shutil.rmtree(path)
+            path = '/uploads'
+            if os.path.exists(root, path):
+                shutil.rmtree(root, path)
                 response = make_response('Folder removed!')
                 response.status_code = 200
                 return response
