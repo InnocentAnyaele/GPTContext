@@ -8,12 +8,15 @@ import time
 import shutil
 import keys
 
+from flask_cors import CORS
+
 # os.environ['OPENAI_API_KEY'] = 'key-here'
 os.environ['OPENAI_API_KEY'] = keys.OPENAI_API_KEY
 
 root = os.path.dirname(__file__)
 
 app = Flask(__name__)
+CORS(app)
 app.config['DEBUG'] = True
 
 
@@ -146,7 +149,7 @@ def get_response():
 def deleteAllContext():
     if request.method == 'DELETE':
         try:
-            path = '/uploads'
+            path = './uploads'
             if os.path.exists(path):
                 shutil.rmtree(path)
                 response = make_response('Folder removed!')
