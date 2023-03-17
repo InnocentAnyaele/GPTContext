@@ -34,7 +34,7 @@ def hello_world():
         
 
 
-@app.route('/addContext', methods=['POST'])
+@app.route('/api/addContext', methods=['POST'])
 def add_context():
     if request.method == 'POST':
         print ('reached---------------------------')
@@ -100,7 +100,7 @@ def add_context():
     
     
     
-@app.route('/getResponse', methods=['POST'])
+@app.route('/api/getResponse', methods=['POST'])
 def get_response():
     if request.method == 'POST':
 
@@ -142,7 +142,7 @@ def get_response():
             
         
 
-@app.route('/deleteAllContext', methods=['DELETE'])
+@app.route('/api/deleteAllContext', methods=['DELETE'])
 def deleteAllContext():
     if request.method == 'DELETE':
         try:
