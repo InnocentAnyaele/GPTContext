@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, jsonify
 from llama_index import GPTSimpleVectorIndex, download_loader
 from werkzeug.utils import secure_filename
 import os
@@ -8,6 +8,7 @@ import time
 import shutil
 import keys
 from flask_cors import CORS
+from functools import wraps
 
 import pandas as pd
 # from gpt_index.indices.struct_store import GPTPandasIndex
@@ -31,15 +32,37 @@ def delete_context(dirName):
         
     return 'completed'
 
-
 @app.route("/")
 def hello_world():
     # print (os.environ['OPENAI_API_KEY'])
     return "<p>The Flask API route for GPTContext</p>"
+
+
+def token_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        token = request.headers['Authorization']
+        print('front-token', token)
+        print('back-token', keys.BEARER_TOKEN)
+        
+        if not token:
+            response = make_response('Authorization is required')
+            response.status_code = 500
+            return response   
+
+        if keys.BEARER_TOKEN != token:
+            response = make_response('Invalid Token')
+            response.status_code = 500
+            return response   
+        
+        return func(*args, **kwargs)
+
+    return decorated_function
         
 
 
 @app.route('/api/addContext', methods=['POST'])
+@token_required
 def add_context():
     if request.method == 'POST':
         # sending from postman
@@ -54,7 +77,7 @@ def add_context():
         #         new_filename = os.path.join(dirName,secure_filename(filename))
         #         file.save(new_filename)   
             
-        try:
+        try:            
             indexKey = str(uuid.uuid1())
             dirName = os.path.join('./uploads/', indexKey)
             os.makedirs(dirName)
@@ -131,9 +154,9 @@ def add_context():
                 if checkAndReturnExtension() == 'csv':
                     print ('Handling CSV')
                     return csvHandler()
-                elif checkAndReturnExtension() == 'xlsx':
-                    print ('Handling XLSX')
-                    return xlsxHandler()
+                # elif checkAndReturnExtension() == 'xlsx':
+                #     print ('Handling XLSX')
+                #     return xlsxHandler()
                 else:
                     print ('Handling Other')
                     return directoryReader()
@@ -156,6 +179,7 @@ def add_context():
     
     
 @app.route('/api/getResponse', methods=['POST'])
+@token_required
 def get_response():
     if request.method == 'POST':
 
@@ -202,6 +226,7 @@ def get_response():
         
 
 @app.route('/api/deleteAllContext', methods=['DELETE'])
+@token_required
 def deleteAllContext():
     if request.method == 'DELETE':
         try:
