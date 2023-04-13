@@ -1,8 +1,9 @@
-![GPTContext](https://user-images.githubusercontent.com/55434969/225579481-15b68e7b-13c2-43ac-9701-c340117d7dde.png)
+![GPTContext](https://user-images.githubusercontent.com/55434969/225579902-ffe9a506-3cc3-4bfa-aca3-e563bcfe87eb.png)
+
 
 # GPTContext
 
-The flask backend for GPTContext app that allows user to upload context file and Chat GPT query AI based on it.
+The React front end for GPTContext app that allows user to upload context files and query chat GPT AI based on it.
 
 ## Technical Overview
 
@@ -11,6 +12,7 @@ The project leverages dataloaders from Llama Hub AI to create indices over the d
 ## Installation Backend
 
 1. Get an OpenAI API key and store it in a file named `keys.py` at the root directory with the name `OPENAI_API_KEY`.
+2. Create a random bearer token and store it in your keys file with the name 'BEARER TOKEN'. This key would be the same with the REACT_APP_BEARER_TOKEN passed with your request from the frontend.
 2. Download the project from GitHub.
 3. Open a terminal and navigate to the project directory.
 4. Install the Python dependencies by running the following command:
@@ -23,6 +25,7 @@ The project leverages dataloaders from Llama Hub AI to create indices over the d
 2. Open in a terminal.
 3. ```npm install``` to install all dependencies
 4. ```npm start``` to start the server.
+5. Create a .env file and create a environmental variable 'REACT_APP_BEARER_TOKEN'. This would be the same with the BEARER_TOKEN at the flask backend for authentication purposes
 
 ### The front-end uses a hosted PythonAnywhere server for its server requests. If you want to host it locally, follow the backend configurations above and get the locally hosted link and follow the steps below
 1. In the frontend directory inside the components/body, open the body.tsx file.
