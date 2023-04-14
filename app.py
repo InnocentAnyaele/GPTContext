@@ -6,7 +6,6 @@ import uuid
 import threading
 import time
 import shutil
-import keys
 from flask_cors import CORS
 from functools import wraps
 
@@ -14,7 +13,15 @@ import pandas as pd
 from gpt_index.indices.struct_store import GPTPandasIndex
 
 # os.environ['OPENAI_API_KEY'] = 'key-here'
-os.environ['OPENAI_API_KEY'] = keys.OPENAI_API_KEY
+
+#from keys
+# import keys
+# os.environ['OPENAI_API_KEY'] = keys.OPENAI_API_KEY
+# BEARER_TOKEN = keys.BEARER_TOKEN
+    
+# from environment
+BEARER_TOKEN = os.environ['BEARER_TOKEN']
+
 
 root = os.path.dirname(__file__)
 
@@ -44,14 +51,13 @@ def token_required(func):
     def decorated_function(*args, **kwargs):
         token = request.headers['Authorization']
         print('front-token', token)
-        print('back-token', keys.BEARER_TOKEN)
         
         if not token:
             response = make_response('Authorization is required')
             response.status_code = 500
             return response   
 
-        if keys.BEARER_TOKEN != token:
+        if BEARER_TOKEN != token:
             response = make_response('Invalid Token')
             response.status_code = 500
             return response   
