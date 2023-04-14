@@ -22,13 +22,14 @@ The project leverages dataloaders from Llama Hub AI to create indices over the d
 
 ## Installation Backend
 
-1. Download the project from github 
-2. Create a random bearer token and store it in your keys file with the name 'BEARER TOKEN'. This key would be the same with the REACT_APP_BEARER_TOKEN passed with your request from the frontend.
-2. Get an OpenAI API key and store it in a file named `keys.py` at the root directory with the name `OPENAI_API_KEY`.
-3. Open a terminal and navigate to the project directory.
-4. Install the Python dependencies by running the following command:
+1. Download the project from github  
+2. Make sure to set your OPEN_AI_KEY environment variable using keys.py or just storing it in the os.env.
+3. Set your BEARER_TOKEN using the same keys.py file (uncomment the part of the code that imports and use keys.py) or set it using the os environment.
+4. Get an OpenAI API key and store it in a file named `keys.py` at the root directory with the name `OPENAI_API_KEY` and store a random 'BEARER_TOKEN' variable. This will mathc 
+5. Open a terminal and navigate to the project directory.
+6. Install the Python dependencies by running the following command:
 ``` pip install -r requirements.txt ```
-5. Run the flask server with the following command ``` python app.py ```
+7. Run the flask server with the following command ``` python app.py ```
 
 ## Installation Frontend
 
