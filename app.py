@@ -11,7 +11,7 @@ from flask_cors import CORS
 from functools import wraps
 
 import pandas as pd
-# from gpt_index.indices.struct_store import GPTPandasIndex
+from gpt_index.indices.struct_store import GPTPandasIndex
 
 # os.environ['OPENAI_API_KEY'] = 'key-here'
 os.environ['OPENAI_API_KEY'] = keys.OPENAI_API_KEY
@@ -22,7 +22,7 @@ app = Flask(__name__)
 CORS(app)
 app.config['DEBUG'] = True
 
-
+# function to delete documents from the context directory 
 def delete_context(dirName):
     time.sleep(300)
     if os.path.exists(dirName):
@@ -38,6 +38,7 @@ def hello_world():
     return "<p>The Flask API route for GPTContext</p>"
 
 
+# this function is to valid the request through a token sent from the client side
 def token_required(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -60,7 +61,7 @@ def token_required(func):
     return decorated_function
         
 
-
+# function to handle file uploads, and create the initial indexes from documents uploaded
 @app.route('/api/addContext', methods=['POST'])
 @token_required
 def add_context():
@@ -77,7 +78,8 @@ def add_context():
         #         new_filename = os.path.join(dirName,secure_filename(filename))
         #         file.save(new_filename)   
             
-        try:            
+        try:     
+            # saving the documents uploaded to a unique folder path.   
             indexKey = str(uuid.uuid1())
             dirName = os.path.join('./uploads/', indexKey)
             os.makedirs(dirName)
@@ -93,10 +95,12 @@ def add_context():
                 fileNamesArray.append(filename)
                 currFile.save(new_filename)  
             
+            #this starts a thread to delete those documents in 5 minutes. 
             t = threading.Thread(target=delete_context, args=(dirName,))
             t.start()
             
             
+            #check the extension of the file uploaded. Only interested in the last file in the array because of the file upload limit (1)
             def checkAndReturnExtension():
                 path = os.path.join(dirName, secure_filename(fileNamesArray[-1]))
                 curr_fileName = fileNamesArray[-1]
@@ -107,6 +111,7 @@ def add_context():
                 print ('curr_fileExtensionOnly', curr_fileExtension[-1])
                 return curr_fileExtensionOnly
             
+            # this takes in the documents / file and creates indices using the GPTSimpleVectorIndex
             def createIndexAndReturnResponse(documents):
                 index = GPTSimpleVectorIndex(documents)
                 indexPath = os.path.join(dirName,'index.json')
@@ -115,7 +120,7 @@ def add_context():
                 response.status_code = 200
                 return response
                  
-            
+            # handles csv files uploaded using the PandasCSVReader
             def csvHandler():
                 path = os.path.join(dirName, secure_filename(fileNamesArray[-1]))
                 print ('csv path', path)
@@ -123,40 +128,19 @@ def add_context():
                 loader = PandasCSVReader()
                 documents = loader.load_data(path)
                 return createIndexAndReturnResponse(documents)
-        
-#             def xlsxHandler():
-#                 path = os.path.join(dirName, secure_filename(fileNamesArray[-1]))
-#                 df = pd.read_excel(path)
-#                 print (df.head())
-#                 index = GPTPandasIndex(df = df).save_to_disk(os.path.join(dirName, 'index.json'))
-# #                 indexResponse = index.query(
-# #     "What colours are in the document and what numbers are in the document?",
-# # )
-# #                 print ('test response', indexResponse)
-#                 response = make_response(indexKey)
-#                 response.status_code = 200
-#                 return response
-                
-
+                    
+            # handles docx, pdfs etc. uploaded using the SimpleDirectoryReader
             def directoryReader():
                 SimpleDirectoryReader = download_loader('SimpleDirectoryReader')
                 loader = SimpleDirectoryReader(dirName, recursive=True)  
                 documents = loader.load_data()
                 return createIndexAndReturnResponse(documents)
 
-            
             try:
-                # return directoryReader()
-                # return csvHandler()
-                # checkAndReturnExtension()
-                
-                
+                # directs files based on their file extensions to their appropriate handlers
                 if checkAndReturnExtension() == 'csv':
                     print ('Handling CSV')
                     return csvHandler()
-                # elif checkAndReturnExtension() == 'xlsx':
-                #     print ('Handling XLSX')
-                #     return xlsxHandler()
                 else:
                     print ('Handling Other')
                     return directoryReader()
@@ -176,35 +160,48 @@ def add_context():
         
         
     
-    
-    
+# this api handles queries from the user about their document 
 @app.route('/api/getResponse', methods=['POST'])
 @token_required
 def get_response():
     if request.method == 'POST':
-
+        
+        # getting request parameters
         indexKey = request.form['indexKey']
         prompt = request.form['prompt']
-        
+        fileType = request.form['fileType']
+        fileName = request.form['fileName']
         print (indexKey)        
         print (prompt)
+        print (fileType)
+        print (fileName)
                     
-        try:
-            indexKey = request.form['indexKey']
-            prompt = request.form['prompt']
-            fileType = request.form['fileType']
-            
+        try:      
             print ('this is the fileType gotten from the frontend', fileType)
             
+            # checks if index exists in parameter
             if len(indexKey) < 1:
                 response = make_response('No index has been built yet for this prompt')
                 response.status_code = 404
                 return response
             
+            # handles xlsx request. For xlsx, it rebuilds the query from the xlsx file stored everytime the user queries
+            if (fileType == 'xlsx'):
+                xlsxPath = os.path.join('uploads', indexKey, fileName)
+                df = pd.read_excel(xlsxPath)
+                index = GPTPandasIndex(df = df)
+                indexResponse = index.query(prompt)
+                print (indexResponse)
+                response = make_response(str(indexResponse))
+                response.status_code = 200
+                return response
+            
+            # builds the path to the stored indexes using the unique key passed from client
             indexPath = os.path.join('uploads',indexKey,'index.json')
             
             print (indexPath)
             
+            # if that saved index exists, it loads it from disk and queries it             
             if os.path.exists(indexPath):
                 index = GPTSimpleVectorIndex.load_from_disk(indexPath)
                 # index = GPTPandasIndex.load_from_disk(indexPath)
@@ -213,9 +210,11 @@ def get_response():
                 response.status_code = 200
                 return response
             else:
+                # if index does not exist, it means the files has been deleted (session expired)
                 response = make_response('Index has expired for this prompt')
                 response.status_code = 404
-                return response    
+                return response
+        # catches unseen errors    
         except Exception as e:
             print (e)
             response = make_response('Something went wrong')
