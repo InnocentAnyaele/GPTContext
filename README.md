@@ -39,12 +39,10 @@ The project leverages dataloaders from Llama Hub AI to create indices over the d
 4. ```npm start``` to start the server.
 5. Create a .env file and create a environmental variable 'REACT_APP_BEARER_TOKEN'. This would be the same with the BEARER_TOKEN at the flask backend for authentication purposes
 
-### The front-end uses a hosted PythonAnywhere server for its server requests. If you want to host it locally, follow the backend configurations above and get the locally hosted link and follow the steps below
-1. In the frontend directory inside the components/body, open the body.tsx file.
-2. There are two axios request that uses the 'https://1nnocent.pythonanywhere.com' for their prefix.
-3. Replace this prefix with the locally hosted route eg. 'http://127.0.0.1:5000'
-4. Restart the server.
-5. Project should run locally now.
+### If you want to host it locally, follow the backend configurations above and get the locally hosted link and follow the steps below & set the frontend to use that route
+1. In the frontend directory inside the utis/api, set the api to use your localhost
+2. Restart the server.
+3. Project should run locally now.
 
 
 ## Contributing
