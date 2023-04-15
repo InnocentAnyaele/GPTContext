@@ -120,10 +120,12 @@ def add_context():
             # this takes in the documents / file and creates indices using the GPTSimpleVectorIndex
             def createIndexAndReturnResponse(documents):
                 index = GPTSimpleVectorIndex(documents)
+                print ('this is the index', index)
                 indexPath = os.path.join(dirName,'index.json')
                 index.save_to_disk(indexPath)
                 response = make_response(indexKey)
                 response.status_code = 200
+                print ('this is the response', response)
                 return response
                  
             # handles csv files uploaded using the PandasCSVReader
@@ -147,6 +149,10 @@ def add_context():
                 if checkAndReturnExtension() == 'csv':
                     print ('Handling CSV')
                     return csvHandler()
+                elif checkAndReturnExtension() == 'xlsx':
+                    response = make_response(indexKey)
+                    response.status_code = 200
+                    return response
                 else:
                     print ('Handling Other')
                     return directoryReader()
