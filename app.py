@@ -12,7 +12,6 @@ from functools import wraps
 import pandas as pd
 from gpt_index.indices.struct_store import GPTPandasIndex
 
-# os.environ['OPENAI_API_KEY'] = 'key-here'
 
 #from keys
 # import keys
@@ -21,6 +20,7 @@ from gpt_index.indices.struct_store import GPTPandasIndex
     
 # from environment
 BEARER_TOKEN = os.environ['BEARER_TOKEN']
+# os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 
 
 root = os.path.dirname(__file__)
@@ -193,7 +193,7 @@ def get_response():
             
             # handles xlsx request. For xlsx, it rebuilds the query from the xlsx file stored everytime the user queries
             if (fileType == 'xlsx'):
-                xlsxPath = os.path.join('uploads', indexKey, fileName)
+                xlsxPath = os.path.join('uploads', indexKey, secure_filename(fileName))
                 df = pd.read_excel(xlsxPath)
                 index = GPTPandasIndex(df = df)
                 indexResponse = index.query(prompt)
