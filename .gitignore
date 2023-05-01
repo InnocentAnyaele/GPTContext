@@ -29,4 +29,6 @@ htmlcov/
 .coverage.*
 *,cover
 
+uploads/
+
 
