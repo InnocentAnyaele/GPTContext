@@ -25,7 +25,7 @@ The project leverages dataloaders from Llama Hub AI to create indices over the d
 1. Download the project from github  
 2. Make sure to set your OPEN_AI_KEY environment variable using keys.py or just storing it in the os.env.
 3. Set your BEARER_TOKEN using the same keys.py file (uncomment the part of the code that imports and use keys.py) or set it using the os environment.
-4. Get an OpenAI API key and store it in a file named `keys.py` at the root directory with the name `OPENAI_API_KEY` and store a random 'BEARER_TOKEN' variable. This will mathc 
+4. Get an OpenAI API key and store it in a file named `keys.py` at the root directory with the name `OPENAI_API_KEY` and store a random 'BEARER_TOKEN' variable. This will match the token passed from the front end for verification purposes. 
 5. Open a terminal and navigate to the project directory.
 6. Install the Python dependencies by running the following command:
 ``` pip install -r requirements.txt ```
